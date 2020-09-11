@@ -1,6 +1,6 @@
 # DigitalDrawer
 
-## Store your favorite content with style and notes!
+Store your favorite content with style and notes!
 
 DigitalDrawer is a digital bookmarking and content storage service focused on helping users store their favorite content.
 
