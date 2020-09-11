@@ -14,7 +14,7 @@ DigitalDrawer is a digital bookmarking and content storage service focused on he
   * Josh Beatty
   
 ---
-## SQL OTIONS (Order by preference)
+## SQL OPTIONS (Order by preference)
   1. MySQL
   2. Aurora
   3. PostgreSQL
