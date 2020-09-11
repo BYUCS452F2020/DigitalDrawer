@@ -4,7 +4,8 @@ Store your favorite content with style and notes!
 
 DigitalDrawer is a digital bookmarking and content storage service focused on helping users store their favorite content.
 
-> Our business believes that not all content is created equal; as such, with our service, customers will be able to quickly store favorite content with a stylish interface and notes to capture context. 
+> "Our business believes that **not all content is created equal**; as such, with our service, customers will be able to **quickly store** favorite content with a **stylish interface** and notes to capture context." 
+> - DigitalDrawer LLC
 
 ---
 ## TEAM
