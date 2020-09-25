@@ -1,8 +1,48 @@
 User(UserID, UserName, FirstName, LastName, Email, SubscriberType)
     Foreign Key UserName references Credentials
+Table Explantion:
+Entity:
+Relationship To Other Tables:
+Normalization Evidence:
+Columns:
+	UserID:
+	FirstName:
+	LastName:
+	Email:
+	SubscriberType:
+	
 Content(UrlID, UserID, Rating, Frequency, Url)
     Foreign Key UserID references User
+Table Explantion:
+Entity:
+Relationship To Other Tables:
+Normalization Evidence:
+Columns:
+	UrlID:
+	UserID:
+	Rating:
+	Frequency:
+	Url:
+ 
 Credentials(UserName, PasswordHash, Salt)
     Foreign Key UserName references User
+Table Explantion:
+Entity:
+Relationship To Other Tables:
+Normalization Evidence:
+Columns:
+	UserName:
+	PasswordHash:
+	Salt:
+    
 Payment(PaymentID, UserID, PaymentType, CardNumber)
     Foreign Key UserID references User
+Table Explantion:
+Entity:
+Relationship To Other Tables:
+Normalization Evidence:
+Columns:
+	PaymentID:
+	UserID:
+	PaymentType:
+	CardNumber:
