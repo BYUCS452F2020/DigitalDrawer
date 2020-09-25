@@ -1,48 +1,48 @@
 User(UserID, UserName, FirstName, LastName, Email, SubscriberType)
     Foreign Key UserName references Credentials
-Table Explantion:
+Table Explantion: Holds the data for each User.
 Entity:
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
-	UserID:
-	FirstName:
-	LastName:
-	Email:
-	SubscriberType:
+	UserID: Unique identifier for each user.
+	FirstName: User's first name.
+	LastName: User's last name.
+	Email: User's email address.
+	SubscriberType: Paid or Free
 	
 Content(UrlID, UserID, Rating, Frequency, Url)
     Foreign Key UserID references User
-Table Explantion:
+Table Explantion: Holds the content that the user wants to store in their drawer.
 Entity:
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
-	UrlID:
-	UserID:
-	Rating:
-	Frequency:
-	Url:
+	UrlID: Unique identifier for URL
+	UserID: Unique identifer to reference a user.
+	Rating: What rating the user has given to this content.
+	Frequency: How often the User uses this content.
+	Url: URL link to the actual content.
  
 Credentials(UserName, PasswordHash, Salt)
     Foreign Key UserName references User
-Table Explantion:
+Table Explantion: Login credentials for each user.
 Entity:
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
-	UserName:
-	PasswordHash:
-	Salt:
+	UserName: Username for the User.
+	PasswordHash: Hash of the user password.
+	Salt: Salt for the user password hash.
     
 Payment(PaymentID, UserID, PaymentType, CardNumber)
     Foreign Key UserID references User
-Table Explantion:
+Table Explantion: Holds the payment details for users.
 Entity:
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
-	PaymentID:
-	UserID:
-	PaymentType:
-	CardNumber:
+	PaymentID: Unique identifer for a payment
+	UserID: Unique identifer referencing a user.
+	PaymentType: Credit | Debit
+	CardNumber: Number for the card the user used.
