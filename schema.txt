@@ -1,7 +1,7 @@
 User(UserID, UserName, FirstName, LastName, Email, SubscriberType)
     Foreign Key UserName references Credentials
 Table Explantion: Holds the data for each User.
-Entity:
+Entity: A row, or an entity, represents a specific user registered in DigitalDrawer service.
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
@@ -14,7 +14,7 @@ Columns:
 Content(UrlID, UserID, Rating, Frequency, Url)
     Foreign Key UserID references User
 Table Explantion: Holds the content that the user wants to store in their drawer.
-Entity:
+Entity: A row, or an entity, represents specific stored of content of a user.
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
@@ -27,7 +27,7 @@ Columns:
 Credentials(UserName, PasswordHash, Salt)
     Foreign Key UserName references User
 Table Explantion: Login credentials for each user.
-Entity:
+Entity: A row, or an entity, represents credentials of specific user, who is registered in DigitalDrawer.
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
@@ -38,7 +38,7 @@ Columns:
 Payment(PaymentID, UserID, PaymentType, CardNumber)
     Foreign Key UserID references User
 Table Explantion: Holds the payment details for users.
-Entity:
+Entity: A row, or an entity, represents a specific instance of a user's payment transaction.
 Relationship To Other Tables:
 Normalization Evidence:
 Columns:
