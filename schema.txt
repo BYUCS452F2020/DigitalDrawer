@@ -1,4 +1,8 @@
 User(UserID, UserName, FirstName, LastName, Email, SubscriberType)
+    Foreign Key UserName references Credentials
 Content(UrlID, UserID, Rating, Frequency, Url)
+    Foreign Key UserID references User
 Credentials(UserName, PasswordHash, Salt)
-Payment(PaymentID, UserID, PaymentType, CardID)
+    Foreign Key UserName references User
+Payment(PaymentID, UserID, PaymentType, CardNumber)
+    Foreign Key UserID references User
