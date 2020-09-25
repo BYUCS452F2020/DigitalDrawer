@@ -2,7 +2,7 @@ User(UserID, UserName, FirstName, LastName, Email, SubscriberType)
     Foreign Key UserName references Credentials
 Table Explantion: Holds the data for each User.
 Entity: A row, or an entity, represents a specific user registered in DigitalDrawer service.
-Relationship To Other Tables:
+Relationship To Other Tables: User has Credentials, User has Payment, User saves Content
 Normalization Evidence: The table represents one entity: the user. All columns depend on the primary key: UserID.
 Columns:
 	UserID: Unique identifier for each user.
@@ -15,7 +15,7 @@ Content(UrlID, UserID, Rating, Frequency, Url)
     Foreign Key UserID references User
 Table Explantion: Holds the content that the user wants to store in their drawer.
 Entity: A row, or an entity, represents specific stored of content of a user.
-Relationship To Other Tables:
+Relationship To Other Tables: User saves Content
 Normalization Evidence: The table represents one entity: a piece of user-saved content. All columns depend on the primary key: UrlID. The URL is also unique, but the ID will be used as the primary key in case the content changes location.
 Columns:
 	UrlID: Unique identifier for URL
@@ -28,7 +28,7 @@ Credentials(UserName, PasswordHash, Salt)
     Foreign Key UserName references User
 Table Explantion: Login credentials for each user.
 Entity: A row, or an entity, represents credentials of specific user, who is registered in DigitalDrawer.
-Relationship To Other Tables:
+Relationship To Other Tables: User has Credentials
 Normalization Evidence: The table represents one entity: user credentials. Both the password chosen by the user and the salt chosen by the system depend on the username: passwords and salts can be repeated, while the username is unique. This table also has to be separate from the user table because it is sensitive information that the system should have access to, not employees.
 Columns:
 	UserName: Username for the User.
@@ -39,7 +39,7 @@ Payment(PaymentID, UserID, PaymentType, CardNumber)
     Foreign Key UserID references User
 Table Explantion: Holds the payment details for users.
 Entity: A row, or an entity, represents a specific instance of a user's payment transaction.
-Relationship To Other Tables:
+Relationship To Other Tables: User has Payment
 Normalization Evidence: The table represents one entity: user payment information. All collumns depend on PaymentID, including UserID, since users can have multiple payments, but a payment is unique and has one user. This table also has to be separate from the user table because it is sensitive information. Only employees that need the information, for tasks such as correcting payment information at the request of a user, should be able to access it.
 Columns:
 	PaymentID: Unique identifer for a payment
