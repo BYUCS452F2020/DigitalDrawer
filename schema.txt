@@ -9,7 +9,7 @@ Columns:
 	FirstName: User's first name.
 	LastName: User's last name.
 	Email: User's email address.
-	SubscriberType: Paid or Free
+	SubscriberType: Paid or Free.
 	
 Content(UrlID, UserID, Rating, Frequency, Url)
     Foreign Key UserID references User
@@ -18,7 +18,7 @@ Entity: A row, or an entity, represents specific stored of content of a user.
 Relationship To Other Tables: User saves Content
 Normalization Evidence: The table represents one entity: a piece of user-saved content. All columns depend on the primary key: UrlID. The URL is also unique, but the ID will be used as the primary key in case the content changes location.
 Columns:
-	UrlID: Unique identifier for URL
+	UrlID: Unique identifier for URL.
 	UserID: Unique identifer to reference a user.
 	Rating: What rating the user has given to this content.
 	Frequency: How often the User uses this content.
@@ -42,7 +42,7 @@ Entity: A row, or an entity, represents a specific instance of a user's payment 
 Relationship To Other Tables: User has Payment
 Normalization Evidence: The table represents one entity: user payment information. All collumns depend on PaymentID, including UserID, since users can have multiple payments, but a payment is unique and has one user. This table also has to be separate from the user table because it is sensitive information. Only employees that need the information, for tasks such as correcting payment information at the request of a user, should be able to access it.
 Columns:
-	PaymentID: Unique identifer for a payment
+	PaymentID: Unique identifer for a payment.
 	UserID: Unique identifer referencing a user.
-	PaymentType: Credit | Debit
+	PaymentType: Credit | Debit.
 	CardNumber: Number for the card the user used.
