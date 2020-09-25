@@ -1,1 +1,4 @@
-TODO: Textual representation of our schema goes here
+User(UserID, UserName, FirstName, LastName, Email, SubscriberType)
+Content(UrlID, UserID, Rating, Frequency, Url)
+Credentials(UserName, PasswordHash, Salt)
+Payment(PaymentID, UserID, PaymentType, CardID)
