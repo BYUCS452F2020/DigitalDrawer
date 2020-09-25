@@ -1,0 +1,8 @@
+I am interested in participating in this project because I think it would provide an efficient way to store contents and organize data. 
+For instance, it's really annoying when my photo albums are filled up with "garbage" classroom lecture note images or when there are random meme images in the middle of vacation photos.
+ I will contribute with my experience of MongoDB and DynamoDB and other SQls.
+
+
+Business: It seems like a great business idea with ad or subscription for ad-less experience
+Legal: I don't have any idea on this
+Technical: I think it would be good to think about estimated traffic as we design the database and services.
