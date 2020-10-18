@@ -14,8 +14,8 @@ app.get('/', (req, res) => {
 
 app.get('/test', async (req, res) => {
     try {
-        const newT = await pool.query("INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
-            ["test2", "test2"]);
+        const newT = await pool.query("INSERT INTO users (username) VALUES ($1) RETURNING *",
+            ["test2"]);
 
         res.json(newT);
 
