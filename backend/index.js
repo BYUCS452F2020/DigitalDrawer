@@ -95,7 +95,7 @@ app.post('/users/register', async (req, res) => {
             }
 
             if (results.rows.length > 0) {
-                res.send("username already registered")
+                res.status(400).send("username already registered")
             } else {
                 console.log("insert");
                 pool.query(
@@ -109,7 +109,7 @@ app.post('/users/register', async (req, res) => {
                         }
                         // console.log("returning");
                         console.log(results.rows);
-                        res.send(results.rows);
+                        //res.send(results.rows);
                         pool.query(
                             `INSERT INTO credentials (UserName, PasswordHash, Salt)
                          VALUES ($1, $2, $3)
@@ -121,7 +121,7 @@ app.post('/users/register', async (req, res) => {
                                 }
                                 // console.log("returning");
                                 console.log(results.rows);
-                                res.send(results.rows);
+                                res.status(200).send(results.rows);
                             }
                         )
                     }
@@ -185,6 +185,71 @@ app.post('/entity/create', (req, res) => {
     )
 });
 
+app.get('/entity/get', (req, res) => {
+    verified = verifyToken(req);
+    if(!verified){
+        res.status(401).send('unauthorized')
+    }
+
+    pool.query(
+        `SELECT userid
+             FROM users
+             WHERE UserName = $1`,
+        [UserName],
+        (err, results) => {
+            if (err) {
+                res.status(500).send(err);
+            }
+
+            if (results.rows.length > 0) {
+                let UserID = results.rows[0];
+                pool.query(
+                    `SELECT * 
+                        FROM entity
+                         WHERE userid = $1`,
+                    [UserID],
+                    (err, results) => {
+                        if (err) {
+                            res.status(500).send(err);
+                        }
+                        // console.log("returning");
+                        console.log(results.rows);
+                        res.status(200).send(results.rows);
+                    }
+                )
+            } else {
+                res.status(400).send("bad request");
+            }
+        }
+    )
+    
+})
+
+
+app.get('/entity/get/:id', (req, res) => {
+    verified = verifyToken(req);
+    if(!verified){
+        res.status(401).send('unauthorized')
+    }
+
+    var id = req.params.id;
+
+    pool.query(
+        `SELECT *
+            FROM entity
+            WHERE urlid = $1`,
+            [UserID],
+        (err, results) => {
+            if (err) {
+                res.status(500).send(err);
+            }
+            console.log(results.rows);
+            if (results.rows.length > 0) {
+                res.status(200).send(results.rows);
+            }
+        }
+    )
+})
 
 function verifyToken(req){
     let token = req.headers['x-access-token'] || req.headers['authorization'];
