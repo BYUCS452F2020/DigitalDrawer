@@ -5,6 +5,8 @@ const pool = require("./db/index");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const MESSAGE_UNAUTHORIZED = 'Unauthorized'
+const jwtSecret = "JWT_SECRET";
 
 app.use(express.json());
 
@@ -12,30 +14,14 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 })
 
-app.get('/test', async (req, res) => {
-    try {
-        const newT = await pool.query("INSERT INTO users (username) VALUES ($1) RETURNING *",
-            ["test2"]);
-
-        res.json(newT);
-
-    } catch (err) {
-        console.log(err);
-    }
-
-
-});
-
-var num = 0
-
 app.post('/users/login', (req, res) => {
-    const name = req.body.username;
-    const password = req.body.password;
+    const userName = req.body.UserName;
+    const password = req.body.Password;
     pool.query(
-            `SELECT *
-             FROM users
-             WHERE username = $1`,
-        [name],
+            `SELECT PasswordHash
+             FROM CREDENTIALS
+             WHERE userName = $1`,
+        [userName],
         (err, results) => {
             if (err) {
                 throw err;
@@ -44,17 +30,35 @@ app.post('/users/login', (req, res) => {
             if (results.rows.length !== 1) {
                 res.send("Invalid credentials")
             } else {
-                let passwordIsValid = bcrypt.compareSync(password, results.rows[0].password);
+                const hash = results.rows[0].passwordhash
+                let passwordIsValid = bcrypt.compareSync(password, hash);
 
                 if(!passwordIsValid)
                     return res.status(401).send( {auth:false, token:null});
-                const secret = "JWT_SECRET"
-                let token = jwt.sign( {id: name}, secret,{
-                    // let token = jwt.sign( {id: name}, config.secret,{
-                    expiresIn: 86400 // expires in 24 hours
-                });
 
-                res.status(200).send({ auth: true, token: token});
+                pool.query(
+                    `SELECT userid
+                    FROM users
+                    WHERE username = $1`,
+                    [userName],
+                    (err, user_results) => {
+                        if (err) {
+                            res.status(500).send(err);
+                        }
+                        console.log(user_results.rows);
+                        if (user_results.rows.length > 0) {
+                            const userID = user_results.rows[0].userid;
+                            let token = jwt.sign( {userName: userName, userID: userID}, jwtSecret,{
+                                // let token = jwt.sign( {id: name}, config.secret,{
+                                expiresIn: 86400 // expires in 24 hours
+                            });
+
+                            res.status(200).send({ auth: true, token: token});
+                        }
+                    }
+                )
+
+
             }
         }
     )
@@ -65,6 +69,7 @@ app.post('/users/login', (req, res) => {
     // });
 });
 
+// let passwordIsValid = bcrypt.compareSync(password, results.rows[0].password);
 //const payload = jwt.verify(jwtToken, process.env.jwtSecret);
 //req.user = payload.user;
 
@@ -121,7 +126,7 @@ app.post('/users/register', async (req, res) => {
                                 }
                                 // console.log("returning");
                                 console.log(results.rows);
-                                res.status(200).send(results.rows);
+                                res.status(201).send(results.rows);
                             }
                         )
                     }
@@ -141,111 +146,158 @@ app.post('/users/register', async (req, res) => {
  *  authorization: Bearer <token>
  */
 app.post('/entity/create', (req, res) => {
-    verified = verifyToken(req);
-    if(!verified){
-        res.status(401).send('unauthorized')
+    let payload = verifyToken(req);
+    if(!payload){
+        res.status(401).send(MESSAGE_UNAUTHORIZED)
     }
 
-    const UserName = req.body.UserName;
-    let Rating = req.body.Rating;
-    let Frequency = req.body.Frequency;
-    let Url = req.body.Url;
+    var userID = payload.userID;
+    let rating = req.body.Rating;
+    // let frequency = req.body.Frequency;
+    let url = req.body.Url;
 
     pool.query(
-        `SELECT *
-             FROM users
-             WHERE UserName = $1`,
-        [UserName],
+            `INSERT INTO entity (userid, rating, frequency, url)
+             VALUES ($1, $2, $3, $4)
+             RETURNING *`,
+        [userID, rating, 0, url],
         (err, results) => {
             if (err) {
-                throw err;
+                throw err
             }
-
-            if (results.rows.length > 0) {
-                // UserID = results.rows[0].UserID
-                const UserID = 1;
-                pool.query(
-                    `INSERT INTO entity (userid, rating, frequency, url)
-                         VALUES ($1, $2, $3, $4)
-                         RETURNING userid, urlid`,
-                    [UserID, Rating, Frequency, Url],
-                    (err, results) => {
-                        if (err) {
-                            throw err
-                        }
-                        // console.log("returning");
-                        console.log(results.rows);
-                        res.send(results.rows);
-                    }
-                )
-            } else {
-                console.log("insert");
-            }
+            // console.log("returning");
+            console.log(results.rows);
+            res.status(201).send(results.rows);
         }
     )
 });
 
-app.get('/entity/get', (req, res) => {
-    verified = verifyToken(req);
-    if(!verified){
-        res.status(401).send('unauthorized')
+app.get('/entity', (req, res) => {
+    let payload = verifyToken(req);
+    if(!payload){
+        res.status(401).send(MESSAGE_UNAUTHORIZED)
     }
 
+    var userID = payload.userID;
+
     pool.query(
-        `SELECT userid
-             FROM users
-             WHERE UserName = $1`,
-        [UserName],
+            `SELECT *
+             FROM entity
+             WHERE userid = $1`,
+        [userID],
         (err, results) => {
             if (err) {
                 res.status(500).send(err);
             }
-
-            if (results.rows.length > 0) {
-                let UserID = results.rows[0];
-                pool.query(
-                    `SELECT * 
-                        FROM entity
-                         WHERE userid = $1`,
-                    [UserID],
-                    (err, results) => {
-                        if (err) {
-                            res.status(500).send(err);
-                        }
-                        // console.log("returning");
-                        console.log(results.rows);
-                        res.status(200).send(results.rows);
-                    }
-                )
-            } else {
-                res.status(400).send("bad request");
-            }
+            // console.log("returning");
+            console.log(results.rows);
+            res.status(200).send(results.rows);
         }
     )
     
 })
 
+app.delete('/users/:userId', (req, res) => {
+    // const userIndex = getUserIndex(req.params.userId)
+    //if (userIndex === -1) return res.status(404).json({})
 
-app.get('/entity/get/:id', (req, res) => {
-    verified = verifyToken(req);
-    if(!verified){
-        res.status(401).send('unauthorized')
+    //users.splice(userIndex, 1)
+    res.send("hi");
+    //res.json(users)
+})
+
+app.delete('/entity/:id', function (req, res) {
+    let payload = verifyToken(req)
+    if(!payload){
+        res.status(401).send(MESSAGE_UNAUTHORIZED)
     }
 
-    var id = req.params.id;
+    var userID = payload.userID;
+    var urlID = req.params.id;
 
     pool.query(
-        `SELECT *
+        `DELETE
             FROM entity
-            WHERE urlid = $1`,
-            [UserID],
+            WHERE urlid = $1 AND userid = $2`,
+        [urlID, userID],
         (err, results) => {
             if (err) {
                 res.status(500).send(err);
             }
-            console.log(results.rows);
-            if (results.rows.length > 0) {
-                res.status(200).send(results.rows);
+            console.log(results.rowCount);
+
+            if(results.rowCount > 0){
+                res.status(200).send(results.rowCount + " row(s) deleted");
+            }
+            else{
+                res.status(400).send("nothing was deleted")
+            }
+
+        }
+    )
+})
+
+// app.put('/entity/:id', (req, res) => {
+//     let payload = verifyToken(req);
+//     if(!payload){
+//         res.status(401).send('unauthorized')
+//     }
+//
+//     var userID = payload.userID;
+//     var urlID = req.params.id;
+//
+//
+//     var rating = req.body.Rating;
+//     var frequency = req.body.Frequency;
+//     var url = req.body.Url;
+//
+//     var info = {}
+//
+//     if(rating)
+//         info['rating'] = rating
+//     if(frequency)
+//         info['frequency'] = frequency
+//     if(url)
+//         info['url'] = url
+//
+//     pool.query(
+//         `UPDATE entity
+//         SET url = $1
+//         WHERE urlid = $2 `,
+//         [urlID, userID],
+//         (err, entity_results) => {
+//             if (err) {
+//                 res.status(500).send(err);
+//             }
+//             console.log(entity_results.rows);
+//             if (entity_results.rows.length > 0) {
+//                 res.status(200).send(entity_results.rows);
+//             }
+//         }
+//     )
+// })
+
+app.get('/entity/:id', (req, res) => {
+    let payload = verifyToken(req);
+    if(!payload){
+        res.status(401).send('unauthorized')
+    }
+
+    var userID = payload.userID;
+    var urlID = req.params.id;
+
+    pool.query(
+        `SELECT *
+        FROM entity
+        WHERE urlid = $1 AND userid = $2`,
+        [urlID, userID],
+        (err, entity_results) => {
+            if (err) {
+                res.status(500).send(err);
+            }
+            console.log(entity_results.rows);
+            if (entity_results.rows.length > 0) {
+                res.status(200).send(entity_results.rows);
             }
         }
     )
@@ -263,20 +315,7 @@ function verifyToken(req){
         token = token.slice(7, token.length).trimLeft();
     }
     if (token) {
-
-        jwt.verify(token, config.secret, (err, decoded) => {
-            if (err) {
-                return false;
-                // return res.json({
-                //     success: false,
-                //     message: 'Token is not valid'
-                // });
-            } else {
-                return true;
-                // req.decoded = decoded;
-                // next();
-            }
-        });
+        return jwt.verify(token, process.env.jwtSecret || jwtSecret);
     }
 
     return false;
