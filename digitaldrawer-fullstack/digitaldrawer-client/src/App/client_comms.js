@@ -1,4 +1,3 @@
-/*
 // Client-Server Communication
 // Creates requests and handles responses
 // Using server API
@@ -7,7 +6,7 @@ const READY_STATE_REQUEST_FINISHED = 4;
 class ClientCommunicator {
 
     constructor() {
-        self.token = null;
+        this.token = null;
         // TODO: add model to be able to pass in data
     }
 
@@ -35,7 +34,7 @@ class ClientCommunicator {
                     // TODO: LOGIN
                     // if auth=true, get token
                     if (this.body.auth == true) {
-                        token = commsRef.body.token;
+                        commsRef.token = this.body.token;
                     }
                 } else if (this.status === 401) {
                     throw "ERROR: login failed"
@@ -49,7 +48,7 @@ class ClientCommunicator {
         req.send(body);
     }
 
-    postRegister(server, username, password, firstname, lastname, email) {
+    postRegister(server, username, password, firstname, lastname, email, type) {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
@@ -58,7 +57,7 @@ class ClientCommunicator {
                     // TODO: REGISTER AND LOGIN
                     // if auth=true, get token
                     if (this.body.auth == true) {
-                        token = commsRef.body.token;
+                        commsRef.token = this.body.token;
                         // TODO: check if this sets global token
                     }
                 } else if (this.status === 401) {
@@ -69,7 +68,7 @@ class ClientCommunicator {
             }
         }
         req.open("POST", server + "/register");
-        body = {
+        var body = {
             UserName: username,
             Password: password,
             FirstName: firstname,
@@ -80,7 +79,7 @@ class ClientCommunicator {
         req.send(body);
     }
 
-    postCreateEntity(username, rating, frequency, url) {
+    postCreateEntity(server, username, rating, frequency, url) {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
@@ -93,13 +92,13 @@ class ClientCommunicator {
                 }
             }
         }
-        req.setRequestHeader('authorization', 'Bearer ' + self.token)
+        req.setRequestHeader('authorization', 'Bearer ' + this.token)
         req.open("POST", server + "/entity/create");
-        body = {UserName: username, Rating: rating, Frequency: frequency, Url: url};
+        var body = {UserName: username, Rating: rating, Frequency: frequency, Url: url};
         req.send(body);
     }
 
-    deleteEntity(entityID) {
+    deleteEntity(server, entityID) {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
@@ -112,13 +111,13 @@ class ClientCommunicator {
                 }
             }
         }
-        req.setRequestHeader('authorization', 'Bearer ' + self.token)
+        req.setRequestHeader('authorization', 'Bearer ' + this.token)
         req.open("POST", server + "/entity/delete/" + entityID);
         req.send();
     }
 
     // TODO: Does update entity need body and entityID?
-    updateEntity() {
+    updateEntity(server) {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == READY_STATE_REQUEST_FINISHED) {
@@ -131,20 +130,20 @@ class ClientCommunicator {
                 }
             }
         }
-        req.setRequestHeader('authorization', 'Bearer ' + self.token)
+        req.setRequestHeader('authorization', 'Bearer ' + this.token)
         req.open("PATCH", server + "/entity/update");
         req.send();
     }
 
 
-    getAllEntities() {
+    getAllEntities(server) {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
                     // TODO: Find out where to put the data
-                    data = this.body
+                    var data = this.body
                 } else if (this.status === 401) {
                     throw "ERROR: unauthorized"
                 } else if (this.status === 404) {
@@ -152,19 +151,19 @@ class ClientCommunicator {
                 }
             }
         }
-        req.setRequestHeader('authorization', 'Bearer ' + self.token)
+        req.setRequestHeader('authorization', 'Bearer ' + this.token)
         req.open("GET", server + "/entity/get");
         req.send();
     }
 
-    getEntity(entityID) {
+    getEntity(server, entityID) {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
                     // TODO: Find out where to put the data
-                    data = this.body
+                    var data = this.body
                 } else if (this.status === 401) {
                     throw "ERROR: unauthorized"
                 } else if (this.status === 404) {
@@ -172,8 +171,8 @@ class ClientCommunicator {
                 }
             }
         }
-        req.setRequestHeader('authorization', 'Bearer ' + self.token)
-        req.open("GET", server + "/entity/get/" + id);
+        req.setRequestHeader('authorization', 'Bearer ' + this.token)
+        req.open("GET", server + "/entity/get/" + entityID);
         req.send();
     }
-}*/
+}
