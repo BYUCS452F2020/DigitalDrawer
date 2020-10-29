@@ -6,12 +6,12 @@ console.log(comms)
 
 export class Register extends React.Component {
     register() {
-        var username = document.getElementById("register-username").value;
-        var password = document.getElementById("register-password").value;
-        var firstname = null; 
-        var lastname = null;
-        var email =  document.getElementById("register-email").value;
-        var type = null;
+        const username = document.getElementById("register-username").value;
+        const password = document.getElementById("register-password").value;
+        const firstname = null;
+        const lastname = null;
+        const email = document.getElementById("register-email").value;
+        const type = null;
         comms.postRegister(username, password, firstname, lastname, email, type);
     }
 

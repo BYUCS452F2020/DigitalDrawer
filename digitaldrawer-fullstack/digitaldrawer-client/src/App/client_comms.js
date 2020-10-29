@@ -49,8 +49,8 @@ class ClientCommunicator {
     }
 
     postRegister(server, username, password, firstname, lastname, email, type) {
-        var req = new XMLHttpRequest();
-        var commsRef = this;
+        const req = new XMLHttpRequest();
+        const commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
@@ -67,6 +67,8 @@ class ClientCommunicator {
                 }
             }
         }
+
+        // http://localhost:5000/users/register for server
         req.open("POST", server + "/register");
         var body = {
             UserName: username,
@@ -176,3 +178,5 @@ class ClientCommunicator {
         req.send();
     }
 }
+
+export default new ClientCommunicator();
