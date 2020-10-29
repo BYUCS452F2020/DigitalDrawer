@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 
@@ -6,11 +7,18 @@ const pool = require("./db/index");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const cors = require('cors');
+app.use(cors());
+
 const MESSAGE_UNAUTHORIZED = 'Unauthorized'
 const jwtSecret = "JWT_SECRET";
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'digitaldrawer-client/build')));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}))
+app.use(bodyParser.text());
 
 app.post('/users/login', (req, res) => {
     const userName = req.body.UserName;
@@ -71,13 +79,15 @@ app.post('/users/login', (req, res) => {
 //const payload = jwt.verify(jwtToken, process.env.jwtSecret);
 //req.user = payload.user;
 
+// app.options('/users/register', cors())
 app.post('/users/register', async (req, res) => {
-    const UserName = req.body.UserName;
-    const Password = req.body.Password;
-    const FirstName = req.body.FirstName;
-    const LastName = req.body.LastName;
-    const Email = req.body.Email;
-    const Type = req.body.Type;
+    const body = JSON.parse(req.body)
+    const UserName = body.UserName;
+    const Password = body.Password;
+    const FirstName = body.FirstName;
+    const LastName = body.LastName;
+    const Email = body.Email;
+    const Type = body.Type;
 
     console.log({
         UserName,
@@ -86,7 +96,6 @@ app.post('/users/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(Password, 12);
 
-    console.log("check");
     pool.query(
         `SELECT *
              FROM users
