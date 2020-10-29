@@ -4,6 +4,7 @@ import {Route, Switch} from 'react-router-dom';
 // import Home from './components/home/Home';
 import { LandingApp } from "./components/landing/LandingApp";
 import { LoginApp } from "./components/login/LoginApp";
+import { HomeApp } from "./components/home/HomeApp";
 
 
 class App extends Component {
@@ -12,7 +13,7 @@ class App extends Component {
         <div>
           <Switch>
             <Route exact path='/' component={LoginApp}/>
-            <Route exact path='/home' component={LandingApp}/>
+            <Route exact path='/home' component={HomeApp}/>
           </Switch>
         </div>
     )

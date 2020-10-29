@@ -89,6 +89,8 @@ app.post('/users/register', async (req, res) => {
     const Email = body.Email;
     const Type = body.Type;
 
+
+    console.log("Register POST Request received for: " + UserName);
     console.log({
         UserName,
         Password
