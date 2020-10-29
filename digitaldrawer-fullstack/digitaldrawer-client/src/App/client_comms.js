@@ -3,29 +3,35 @@
 // Using server API
 const READY_STATE_REQUEST_FINISHED = 4;
 
+// TODO: dynamically find server
+const SERVER = 'http://localhost:5000'
+
+
 class ClientCommunicator {
 
-    constructor() {
+    constructor(server_address) {
         this.token = null;
+        this.server = server_address
         // TODO: add model to be able to pass in data
     }
 
-    getDefault(server) {
+
+    getDefault() {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
                     // TODO: PERFORM SOME ACTION
                 } else if (this.status === 404) {
-                    // TODO: SERVER NOT FOUND ERROR MESSAGE
+                    throw "ERROR: not found"
                 }
             }
         }
-        req.open("GET", server + "/");
+        req.open("GET", this.server + "/");
         req.send();
     }
 
-    postLogin(server, username, password) {
+    postLogin(username, password) {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
@@ -33,22 +39,22 @@ class ClientCommunicator {
                 if (this.status === 200) {
                     // TODO: LOGIN
                     // if auth=true, get token
-                    if (this.body.auth == true) {
+                    if (this.body.auth === true) {
                         commsRef.token = this.body.token;
                     }
                 } else if (this.status === 401) {
                     throw "ERROR: login failed"
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw "ERROR: not found"
                 }
             }
         }
-        req.open("POST", server + "/login");
+        req.open("POST", this.server + "/users/login");
         var body = {username: username, password: password};
-        req.send(body);
+        req.send(JSON.stringify(body));
     }
 
-    postRegister(server, username, password, firstname, lastname, email, type) {
+    postRegister(username, password, firstname, lastname, email, type) {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
@@ -56,7 +62,7 @@ class ClientCommunicator {
                 if (this.status === 200) {
                     // TODO: REGISTER AND LOGIN
                     // if auth=true, get token
-                    if (this.body.auth == true) {
+                    if (this.body.auth === true) {
                         commsRef.token = this.body.token;
                         // TODO: check if this sets global token
                     }
@@ -67,7 +73,7 @@ class ClientCommunicator {
                 }
             }
         }
-        req.open("POST", server + "/register");
+        req.open("POST", this.server + "/users/register");
         var body = {
             UserName: username,
             Password: password,
@@ -76,10 +82,12 @@ class ClientCommunicator {
             Email: email,
             Type: type
         };
-        req.send(body);
+        // req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        req.send(JSON.stringify(body));
+
     }
 
-    postCreateEntity(server, username, rating, frequency, url) {
+    postCreateEntity(username, rating, frequency, url) {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
@@ -93,12 +101,12 @@ class ClientCommunicator {
             }
         }
         req.setRequestHeader('authorization', 'Bearer ' + this.token)
-        req.open("POST", server + "/entity/create");
+        req.open("POST", this.server + "/entity/create");
         var body = {UserName: username, Rating: rating, Frequency: frequency, Url: url};
-        req.send(body);
+        req.send(JSON.stringify(body));
     }
 
-    deleteEntity(server, entityID) {
+    deleteEntity(entityID) {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
@@ -112,15 +120,15 @@ class ClientCommunicator {
             }
         }
         req.setRequestHeader('authorization', 'Bearer ' + this.token)
-        req.open("POST", server + "/entity/delete/" + entityID);
+        req.open("POST", this.server + "/entity/delete/" + entityID);
         req.send();
     }
 
     // TODO: Does update entity need body and entityID?
-    updateEntity(server) {
+    updateEntity() {
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
-            if (this.readyState == READY_STATE_REQUEST_FINISHED) {
+            if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
                     // TODO: Find out what to do when update entity works
                 } else if (this.status === 401) {
@@ -131,12 +139,12 @@ class ClientCommunicator {
             }
         }
         req.setRequestHeader('authorization', 'Bearer ' + this.token)
-        req.open("PATCH", server + "/entity/update");
+        req.open("PATCH", this.server + "/entity/update");
         req.send();
     }
 
 
-    getAllEntities(server) {
+    getAllEntities() {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
@@ -152,11 +160,11 @@ class ClientCommunicator {
             }
         }
         req.setRequestHeader('authorization', 'Bearer ' + this.token)
-        req.open("GET", server + "/entity/get");
+        req.open("GET", this.server + "/entity/get");
         req.send();
     }
 
-    getEntity(server, entityID) {
+    getEntity(entityID) {
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
@@ -172,7 +180,9 @@ class ClientCommunicator {
             }
         }
         req.setRequestHeader('authorization', 'Bearer ' + this.token)
-        req.open("GET", server + "/entity/get/" + entityID);
+        req.open("GET", this.server + "/entity/get/" + entityID);
         req.send();
     }
 }
+var comms = new ClientCommunicator(SERVER);
+export default comms;
