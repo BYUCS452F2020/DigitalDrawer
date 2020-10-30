@@ -21,8 +21,9 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.text());
 
 app.post('/users/login', (req, res) => {
-    const userName = req.body.UserName;
-    const password = req.body.Password;
+    const body = JSON.parse(req.body)
+    const userName = body.UserName;
+    const password = body.Password;
     pool.query(
         `SELECT PasswordHash
              FROM CREDENTIALS

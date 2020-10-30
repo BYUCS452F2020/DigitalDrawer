@@ -2,10 +2,10 @@ import React from 'react';
 import loginImg from './login.svg'
 
 import comms from '../../client_comms.js'
-console.log(comms)
 
 export class Register extends React.Component {
     register() {
+        console.log("REGISTER")
         const username = document.getElementById("register-username").value;
         const password = document.getElementById("register-password").value;
         const firstname = null;

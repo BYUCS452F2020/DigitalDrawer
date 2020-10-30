@@ -2,7 +2,6 @@ import React from 'react';
 import loginImg from './login.svg'
 
 import comms from '../../client_comms.js'
-console.log(comms)
 
 export class Login extends React.Component {
     login() {

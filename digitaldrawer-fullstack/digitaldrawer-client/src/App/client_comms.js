@@ -23,7 +23,7 @@ class ClientCommunicator {
                 if (this.status === 200) {
                     // TODO: PERFORM SOME ACTION
                 } else if (this.status === 404) {
-                    throw "ERROR: not found"
+                    throw new Error("ERROR: not found");
                 }
             }
         }
@@ -32,25 +32,32 @@ class ClientCommunicator {
     }
 
     postLogin(username, password) {
+        console.log("logging in as " + username)
         var req = new XMLHttpRequest();
         var commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
-                    // TODO: LOGIN
+                    var res = JSON.parse(this.response)
+                    console.log(document.location)
+                    console.log("response: " + res)
+                    console.log(res.auth)
                     // if auth=true, get token
-                    if (this.body.auth === true) {
-                        commsRef.token = this.body.token;
+                    if (res.auth === true) {
+                        commsRef.token = res.token;
+                        // with the token, go to /home
+                        console.log(document.location)
+                        document.location += 'home'
                     }
                 } else if (this.status === 401) {
-                    throw "ERROR: login failed"
+                    throw new Error("ERROR: login failed");
                 } else if (this.status === 404) {
-                    throw "ERROR: not found"
+                    throw new Error("ERROR: not found");
                 }
             }
         }
         req.open("POST", this.server + "/users/login");
-        var body = {username: username, password: password};
+        var body = {UserName: username, Password: password};
         req.send(JSON.stringify(body));
     }
 
@@ -59,17 +66,17 @@ class ClientCommunicator {
         var commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
-                if (this.status === 200) {
-                    // TODO: REGISTER AND LOGIN
-                    // if auth=true, get token
-                    if (this.body.auth === true) {
-                        commsRef.token = this.body.token;
-                        // TODO: check if this sets global token
-                    }
+                console.log(this)
+                console.log(typeof this)
+                console.log("GOT RESPONSE" + this.status)
+                console.log(this.response)
+                if (this.status === 201) {
+                    // Perform login
+                    commsRef.postLogin(username, password)
                 } else if (this.status === 401) {
-                    throw "ERROR: register failed"
+                    throw new Error("ERROR: register failed");
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw new Error("ERROR: URL not found");
                 }
             }
         }
@@ -94,9 +101,9 @@ class ClientCommunicator {
                 if (this.status === 200) {
                     // TODO: Find out what to do when post entity works
                 } else if (this.status === 401) {
-                    throw "ERROR: unauthorized"
+                    throw new Error("ERROR: unauthorized");
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw new Error("ERROR: URL not found");
                 }
             }
         }
@@ -113,9 +120,9 @@ class ClientCommunicator {
                 if (this.status === 200) {
                     // TODO: Find out what to do when delete entity works
                 } else if (this.status === 401) {
-                    throw "ERROR: unauthorized"
+                    throw new Error("ERROR: unauthorized");
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw new Error("ERROR: URL not found");
                 }
             }
         }
@@ -132,9 +139,9 @@ class ClientCommunicator {
                 if (this.status === 200) {
                     // TODO: Find out what to do when update entity works
                 } else if (this.status === 401) {
-                    throw "ERROR: unauthorized"
+                    throw new Error("ERROR: unauthorized");
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw new Error("ERROR: URL not found");
                 }
             }
         }
@@ -146,16 +153,16 @@ class ClientCommunicator {
 
     getAllEntities() {
         var req = new XMLHttpRequest();
-        var commsRef = this;
+        // var commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
                     // TODO: Find out where to put the data
-                    var data = this.body
+                    // var data = this.response
                 } else if (this.status === 401) {
-                    throw "ERROR: unauthorized"
+                    throw new Error("ERROR: unauthorized");
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw new Error("ERROR: URL not found");
                 }
             }
         }
@@ -166,16 +173,16 @@ class ClientCommunicator {
 
     getEntity(entityID) {
         var req = new XMLHttpRequest();
-        var commsRef = this;
+        // var commsRef = this;
         req.onreadystatechange = function () {
             if (this.readyState === READY_STATE_REQUEST_FINISHED) {
                 if (this.status === 200) {
                     // TODO: Find out where to put the data
-                    var data = this.body
+                    // var data = this.response
                 } else if (this.status === 401) {
-                    throw "ERROR: unauthorized"
+                    throw new Error("ERROR: unauthorized");
                 } else if (this.status === 404) {
-                    throw "ERROR: URL not found"
+                    throw new Error("ERROR: URL not found");
                 }
             }
         }
