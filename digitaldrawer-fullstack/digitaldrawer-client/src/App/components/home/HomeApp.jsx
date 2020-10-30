@@ -36,10 +36,10 @@ export class HomeApp extends Component {
                                 render={() => <Redirect to="/favorites"/>}
                             />
 
-                            <Route path="/favorites" render={() => <Item searchTerm="winter" page="favorites"/>}/>
-                            <Route path="/later" render={() => <Item searchTerm="later" page="later"/>}/>
-                            <Route path="/fun" render={() => <Item searchTerm="color" page="fun"/>}/>
-                            <Route path="/business" render={() => <Item searchTerm="work" page="work"/>}/>
+                            <Route path="/favorites" render={() => <Item searchTerm="Mae Fah Luang" page="favorites"/>}/>
+                            <Route path="/later" render={() => <Item searchTerm="Grand Canyon" page="later"/>}/>
+                            <Route path="/fun" render={() => <Item searchTerm="Utah Arches" page="fun"/>}/>
+                            <Route path="/business" render={() => <Item searchTerm="Grand Teton" page="work"/>}/>
                             {/*<Route path="/addBookmark" render={() => <Item searchTerm="work"/>}/>*/}
                             <Route
                                 path="/search/:searchInput"
