@@ -13,6 +13,9 @@ code {
     monospace;
 }
 
+.jumbotron {
+  background-color: #eeeeee;
+}
 .digitaldrawer-head {
   color: #8a1919;
 }
@@ -57,11 +60,26 @@ a {
 }
 
 .search-form button {
-  outline: none;
   border: none;
   padding: 0px 15px;
   border-radius: 0 0.35em 0.35em 0;
   cursor: pointer;
+}
+
+#wrapper .bookmark-overview {
+  position: relative;
+  bottom:30px;
+  left:0px;
+  visibility:hidden;
+  text-align: center;
+}
+
+#wrapper:hover .bookmark-overview {
+  visibility: visible;
+}
+
+.search-button.null {
+  background-color: #929292;
 }
 
 .active {
@@ -120,6 +138,7 @@ input {
 }
 
 .photo-container li:hover img {
+  opacity: 0.5;
   transform: scale(1.65);
 }
 

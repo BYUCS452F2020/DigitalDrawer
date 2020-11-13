@@ -6,6 +6,7 @@ import Item from "./Item";
 import Search from "./Search";
 import NotFound from "./NotFound";
 
+
 export class HomeApp extends Component {
     // Prevent page reload, clear input, set URL and push history on submit
     handleSubmit = (e, history, searchInput) => {
@@ -35,10 +36,11 @@ export class HomeApp extends Component {
                                 render={() => <Redirect to="/favorites"/>}
                             />
 
-                            <Route path="/favorites" render={() => <Item searchTerm="winter"/>}/>
-                            <Route path="/later" render={() => <Item searchTerm="later"/>}/>
-                            <Route path="/fun" render={() => <Item searchTerm="color"/>}/>
-                            <Route path="/business" render={() => <Item searchTerm="work"/>}/>
+                            <Route path="/favorites" render={() => <Item searchTerm="Mae Fah Luang" page="favorites"/>}/>
+                            <Route path="/later" render={() => <Item searchTerm="Grand Canyon" page="later"/>}/>
+                            <Route path="/fun" render={() => <Item searchTerm="Utah Arches" page="fun"/>}/>
+                            <Route path="/business" render={() => <Item searchTerm="Grand Teton" page="work"/>}/>
+                            {/*<Route path="/addBookmark" render={() => <Item searchTerm="work"/>}/>*/}
                             <Route
                                 path="/search/:searchInput"
                                 render={props => (
