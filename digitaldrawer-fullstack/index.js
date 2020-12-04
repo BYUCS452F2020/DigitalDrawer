@@ -1,9 +1,21 @@
+const USE_NOSQL = true;
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 
 const pool = require("./db/index");
+const aws = require ("aws-sdk");
+
+if (USE_NOSQL) {
+    aws.config.update({
+        region: "local",
+        endpoint: "http://localhost:8000"
+    });
+    var docClient = new aws.DynamoDB.DocumentClient();
+}
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -12,6 +24,7 @@ app.use(cors());
 
 const MESSAGE_UNAUTHORIZED = 'Unauthorized'
 const jwtSecret = "JWT_SECRET";
+
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'digitaldrawer-client/build')));
@@ -24,51 +37,85 @@ app.post('/users/login', (req, res) => {
     const body = JSON.parse(req.body)
     const userName = body.UserName;
     const password = body.Password;
-    pool.query(
-        `SELECT PasswordHash
-             FROM CREDENTIALS
-             WHERE userName = $1`,
-        [userName],
-        (err, results) => {
+    if(!USE_NOSQL) {
+        pool.query(
+            `SELECT PasswordHash
+                FROM CREDENTIALS
+                WHERE userName = $1`,
+            [userName],
+            (err, results) => {
+                if (err) {
+                    throw err;
+                }
+
+                if (results.rows.length !== 1) {
+                    res.send("Invalid credentials")
+                } else {
+                    const hash = results.rows[0].passwordhash
+                    let passwordIsValid = bcrypt.compareSync(password, hash);
+
+                    if (!passwordIsValid)
+                        return res.status(401).send({auth: false, token: null});
+
+                    pool.query(
+                        `SELECT userid
+                        FROM users
+                        WHERE username = $1`,
+                        [userName],
+                        (err, user_results) => {
+                            if (err) {
+                                res.status(500).send(err);
+                            }
+                            console.log(user_results.rows);
+                            if (user_results.rows.length > 0) {
+                                const userID = user_results.rows[0].userid;
+                                let token = jwt.sign({userName: userName, userID: userID}, jwtSecret, {
+                                    // let token = jwt.sign( {id: name}, config.secret,{
+                                    expiresIn: 86400 // expires in 24 hours
+                                });
+
+                                res.status(200).send({auth: true, token: token});
+                            }
+                        }
+                    )
+
+
+                }
+            }
+        )
+    } else {
+        // Get the password data
+        let params = {
+            TableName: "credentials",
+            Key: {
+                'UserName': userName
+            }
+        };
+        docClient.get(params, function(err, data) {
             if (err) {
-                throw err;
-            }
-
-            if (results.rows.length !== 1) {
-                res.send("Invalid credentials")
+                res.status(500).send(err);
             } else {
-                const hash = results.rows[0].passwordhash
-                let passwordIsValid = bcrypt.compareSync(password, hash);
-
-                if (!passwordIsValid)
-                    return res.status(401).send({auth: false, token: null});
-
-                pool.query(
-                    `SELECT userid
-                    FROM users
-                    WHERE username = $1`,
-                    [userName],
-                    (err, user_results) => {
-                        if (err) {
-                            res.status(500).send(err);
-                        }
-                        console.log(user_results.rows);
-                        if (user_results.rows.length > 0) {
-                            const userID = user_results.rows[0].userid;
-                            let token = jwt.sign({userName: userName, userID: userID}, jwtSecret, {
-                                // let token = jwt.sign( {id: name}, config.secret,{
-                                expiresIn: 86400 // expires in 24 hours
-                            });
-
-                            res.status(200).send({auth: true, token: token});
-                        }
+                if ("Item" in data) {
+                    const hash = data.Item.PasswordHash;
+                    // Check if password matches stored hash
+                    let passwordIsValid = bcrypt.compareSync(password, hash);
+                    if (!passwordIsValid) {
+                        return res.status(401).send({auth: false, token: null});
                     }
-                )
-
-
+                    // We did away with the userID, so we don't need to query users
+                    let token = jwt.sign({userName: userName}, jwtSecret, {
+                        // let token = jwt.sign( {id: name}, config.secret,{
+                        expiresIn: 86400 // expires in 24 hours
+                    });
+                    res.status(200).send({auth: true, token: token});
+                } else {
+                    res.send("Invalid credentials");
+                }
             }
-        }
-    )
+        });
+        
+
+    }
 
     // bcrypt.compare(myPlaintextPassword, hash, function(err, res) {
     // if res == true, password matched
@@ -98,54 +145,106 @@ app.post('/users/register', async (req, res) => {
     });
 
     const hashedPassword = await bcrypt.hash(Password, 12);
+    if (!USE_NOSQL) {
+        pool.query(
+            `SELECT *
+                FROM users
+                WHERE UserName = $1`,
+            [UserName],
+            (err, results) => {
+                if (err) {
+                    throw err;
+                }
 
-    pool.query(
-        `SELECT *
-             FROM users
-             WHERE UserName = $1`,
-        [UserName],
-        (err, results) => {
-            if (err) {
-                throw err;
-            }
-
-            if (results.rows.length > 0) {
-                res.status(400).send("username already registered")
-            } else {
-                console.log("insert");
-                pool.query(
-                    `INSERT INTO users (UserName, FirstName, LastName, Email, Type)
-                         VALUES ($1, $2, $3, $4, $5)
-                         RETURNING UserID, UserName`,
-                    [UserName, FirstName, LastName, Email, Type],
-                    (err, results) => {
-                        if (err) {
-                            throw err
-                        }
-                        // console.log("returning");
-                        console.log(results.rows);
-                        //res.send(results.rows);
-                        pool.query(
-                            `INSERT INTO credentials (UserName, PasswordHash, Salt)
-                         VALUES ($1, $2, $3)
-                         RETURNING UserName, PasswordHash`,
-                            [UserName, hashedPassword, 12],
-                            (err, results) => {
-                                if (err) {
-                                    throw err
-                                }
-                                // console.log("returning");
-                                console.log(results.rows);
-                                res.status(201).send(results.rows);
+                if (results.rows.length > 0) {
+                    res.status(400).send("username already registered")
+                } else {
+                    console.log("insert");
+                    pool.query(
+                        `INSERT INTO users (UserName, FirstName, LastName, Email, Type)
+                            VALUES ($1, $2, $3, $4, $5)
+                            RETURNING UserID, UserName`,
+                        [UserName, FirstName, LastName, Email, Type],
+                        (err, results) => {
+                            if (err) {
+                                throw err
                             }
-                        )
-                    }
-                )
+                            // console.log("returning");
+                            console.log(results.rows);
+                            //res.send(results.rows);
+                            pool.query(
+                                `INSERT INTO credentials (UserName, PasswordHash, Salt)
+                            VALUES ($1, $2, $3)
+                            RETURNING UserName, PasswordHash`,
+                                [UserName, hashedPassword, 12],
+                                (err, results) => {
+                                    if (err) {
+                                        throw err
+                                    }
+                                    // console.log("returning");
+                                    console.log(results.rows);
+                                    res.status(201).send(results.rows);
+                                }
+                            )
+                        }
+                    )
 
+
+                }
+            }
+        )
+    } else {
+        // Check if username is already used
+        let usernameTaken = true;
+        let params = {
+            TableName: "users",
+            Key: {
+                'UserName': UserName
+            }
+        };
+        docClient.get(params, function(err, data) {
+            if (err){
+                res.status(500).send(err);
+            } else {
+                usernameTaken = ("Item" in data);
+                // If not, put into users and credentials
+                if (!usernameTaken) {
+                    params = {
+                        TableName: "users",
+                        Item: {
+                            UserName: UserName,
+                            FirstName: FirstName,
+                            LastName: LastName,
+                            Email: Email,
+                            Type: Type
+                        }
+                    };
+                    docClient.put(params, function(err, data) {
+                        if (err) 
+                            res.status(500).send(err);
+                        
+                    });
+
+                    params = {
+                        TableName: "credentials",
+                        Item: {
+                            UserName: UserName,
+                            PasswordHash: hashedPassword,
+                            Salt: 12
+                        }
+                    };
+                    docClient.put(params, function(err, data) {
+                        if (err)
+                            res.status(500).send(err);
+                        else 
+                            res.status(201).send();
+                    });
+                }
 
             }
-        }
-    )
+        });
+
+    }
 
 });
 
@@ -166,20 +265,24 @@ app.post('/entity/create', (req, res) => {
     // let frequency = req.body.Frequency;
     let url = req.body.Url;
 
-    pool.query(
-        `INSERT INTO entity (userid, rating, frequency, url)
-             VALUES ($1, $2, $3, $4)
-             RETURNING *`,
-        [userID, rating, 0, url],
-        (err, results) => {
-            if (err) {
-                throw err
+    if (!USE_NOSQL) {
+        pool.query(
+            `INSERT INTO entity (userid, rating, frequency, url)
+                VALUES ($1, $2, $3, $4)
+                RETURNING *`,
+            [userID, rating, 0, url],
+            (err, results) => {
+                if (err) {
+                    throw err
+                }
+                // console.log("returning");
+                console.log(results.rows);
+                res.status(201).send(results.rows);
             }
-            // console.log("returning");
-            console.log(results.rows);
-            res.status(201).send(results.rows);
-        }
-    )
+        )
+    } else {
+
+    }
 });
 
 app.get('/entity', (req, res) => {
@@ -190,20 +293,24 @@ app.get('/entity', (req, res) => {
 
     var userID = payload.userID;
 
-    pool.query(
-        `SELECT *
-             FROM entity
-             WHERE userid = $1`,
-        [userID],
-        (err, results) => {
-            if (err) {
-                res.status(500).send(err);
+    if (!USE_NOSQL) {
+        pool.query(
+            `SELECT *
+                FROM entity
+                WHERE userid = $1`,
+            [userID],
+            (err, results) => {
+                if (err) {
+                    res.status(500).send(err);
+                }
+                // console.log("returning");
+                console.log(results.rows);
+                res.status(200).send(results.rows);
             }
-            // console.log("returning");
-            console.log(results.rows);
-            res.status(200).send(results.rows);
-        }
-    )
+        )
+    } else {
+
+    }
 
 })
 
@@ -225,25 +332,29 @@ app.delete('/entity/:id', function (req, res) {
     var userID = payload.userID;
     var urlID = req.params.id;
 
-    pool.query(
-        `DELETE
-            FROM entity
-            WHERE urlid = $1 AND userid = $2`,
-        [urlID, userID],
-        (err, results) => {
-            if (err) {
-                res.status(500).send(err);
-            }
-            console.log(results.rowCount);
+    if (!USE_NOSQL) {
+        pool.query(
+            `DELETE
+                FROM entity
+                WHERE urlid = $1 AND userid = $2`,
+            [urlID, userID],
+            (err, results) => {
+                if (err) {
+                    res.status(500).send(err);
+                }
+                console.log(results.rowCount);
 
-            if (results.rowCount > 0) {
-                res.status(200).send(results.rowCount + " row(s) deleted");
-            } else {
-                res.status(400).send("nothing was deleted")
-            }
+                if (results.rowCount > 0) {
+                    res.status(200).send(results.rowCount + " row(s) deleted");
+                } else {
+                    res.status(400).send("nothing was deleted")
+                }
 
-        }
-    )
+            }
+        )
+    } else {
+
+    }
 })
 
 // app.put('/entity/:id', (req, res) => {
@@ -295,21 +406,25 @@ app.get('/entity/:id', (req, res) => {
     var userID = payload.userID;
     var urlID = req.params.id;
 
-    pool.query(
-        `SELECT *
-        FROM entity
-        WHERE urlid = $1 AND userid = $2`,
-        [urlID, userID],
-        (err, entity_results) => {
-            if (err) {
-                res.status(500).send(err);
+    if (!USE_NOSQL) {
+        pool.query(
+            `SELECT *
+            FROM entity
+            WHERE urlid = $1 AND userid = $2`,
+            [urlID, userID],
+            (err, entity_results) => {
+                if (err) {
+                    res.status(500).send(err);
+                }
+                console.log(entity_results.rows);
+                if (entity_results.rows.length > 0) {
+                    res.status(200).send(entity_results.rows);
+                }
             }
-            console.log(entity_results.rows);
-            if (entity_results.rows.length > 0) {
-                res.status(200).send(entity_results.rows);
-            }
-        }
-    )
+        )
+    } else {
+
+    }
 })
 
 function verifyToken(req) {
