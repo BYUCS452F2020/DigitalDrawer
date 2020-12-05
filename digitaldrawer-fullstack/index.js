@@ -7,6 +7,7 @@ const app = express();
 
 const pool = require("./db/index");
 const aws = require ("aws-sdk");
+const uuid = require("uuid");
 
 if (USE_NOSQL) {
     aws.config.update({
@@ -34,7 +35,9 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.text());
 
 app.post('/users/login', (req, res) => {
-    const body = JSON.parse(req.body)
+    var body = req.body
+    if (typeof body === 'string')
+        body = JSON.parse(req.body)
     const userName = body.UserName;
     const password = body.Password;
     if(!USE_NOSQL) {
@@ -103,7 +106,7 @@ app.post('/users/login', (req, res) => {
                         return res.status(401).send({auth: false, token: null});
                     }
                     // We did away with the userID, so we don't need to query users
-                    let token = jwt.sign({userName: userName}, jwtSecret, {
+                    let token = jwt.sign({userName: userName, userID: userName}, jwtSecret, {
                         // let token = jwt.sign( {id: name}, config.secret,{
                         expiresIn: 86400 // expires in 24 hours
                     });
@@ -129,7 +132,10 @@ app.post('/users/login', (req, res) => {
 
 // app.options('/users/register', cors())
 app.post('/users/register', async (req, res) => {
-    const body = JSON.parse(req.body)
+    console.log(req.body)
+    var body = req.body
+    if (typeof body === 'string')
+        body = JSON.parse(req.body)
     const UserName = body.UserName;
     const Password = body.Password;
     const FirstName = body.FirstName;
@@ -197,7 +203,7 @@ app.post('/users/register', async (req, res) => {
         // Check if username is already used
         let usernameTaken = true;
         let params = {
-            TableName: "users",
+            TableName: "credentials",
             Key: {
                 'UserName': UserName
             }
@@ -216,7 +222,8 @@ app.post('/users/register', async (req, res) => {
                             FirstName: FirstName,
                             LastName: LastName,
                             Email: Email,
-                            Type: Type
+                            Type: Type,
+                            UrlIDs: []
                         }
                     };
                     docClient.put(params, function(err, data) {
@@ -281,7 +288,44 @@ app.post('/entity/create', (req, res) => {
             }
         )
     } else {
+        // We assume UserID = UserName
+        // Put entity into entities
+        let urlID = uuid.v4();
+        let params = {
+            TableName: "entity",
+            Item: {
+                UrlID: urlID,
+                Url: url,
+                Rating: rating,
+                UserID: userID,
+                Frequency: 1
+            }
+        };
+        docClient.put(params, function(err, data) {
+            if (err)
+                res.status(500).send(err);
+        });
 
+        // Put a reference of the given entity into the corresponding user
+        params = {
+            TableName:  "users",
+            Key:{
+                UserName: userID
+            },
+            UpdateExpression: "set #ids = list_append(#ids, :id)",
+            ExpressionAttributeNames: {
+                "#ids": "UrlIDs"
+            },
+            ExpressionAttributeValues: {
+                ":id": [urlID]
+            }
+        }
+        docClient.update(params, function(err, data) {
+            if (err)
+                res.status(500).send(err);
+            else 
+                res.status(201).send();
+        });
     }
 });
 
@@ -309,7 +353,44 @@ app.get('/entity', (req, res) => {
             }
         )
     } else {
-
+        // Get entities UrlID list from users
+        let params = {
+            TableName: "users",
+            Key: {
+                UserName: userID
+            }
+        }
+        docClient.get(params, function(err, data) {
+            if (err)
+                res.status(500).send(err);
+            else {
+                if ("Item" in data) {
+                    let UrlIDs = data.Item.UrlIDs;
+                    // for each id, get the user
+                    Keys = []
+                    for (let i = 0; i < UrlIDs.length; i++) {
+                        Keys.push({UrlID: UrlIDs[i]});
+                    }
+                    params = {
+                        RequestItems: {
+                            entity: {
+                                Keys: Keys
+                            }
+                        }
+                    }
+                    docClient.batchGet(params, function(err, data) {
+                        if (err)
+                            res.status(500).send(err);
+                        else {
+                            // TODO: Find out what batchGet data looks like
+                            res.status(200).send(data)
+                        }
+                    })
+                } else {
+                    res.status(400).send("User not found");
+                }
+            }
+        })
     }
 
 })
@@ -353,7 +434,60 @@ app.delete('/entity/:id', function (req, res) {
             }
         )
     } else {
+        let params = {
+            TableName: "entity",
+            Key: {UrlID: urlID}
+        }
+        docClient.delete(params, function(err, data) {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                // TODO: delete from users too
 
+                // Start by getting the users data
+                params = {
+                    TableName: "users",
+                    Key: {UserName: userID}
+                };
+                docClient.get(params, function(err, data) {
+                    if (err) {
+                        res.status(500).send(err);
+                    } else {
+                        if ("Item" in data && "UrlIDs" in data.Item) {
+                            // Delete key from UrlIDs
+                            let ids = data.Item.UrlIDs;
+                            let idx = ids.indexOf(urlID);
+                            if (idx > -1) {
+                                ids.splice(idx,1)
+                            };
+                            
+                            // Replace UrlIDs with new UrlIDs
+                            params = {
+                                TableName: "users",
+                                Key: {
+                                    UserName: userID
+                                },
+                                UpdateExpression: "set #ids = :newid",
+                                ExpressionAttributeNames: {
+                                    "#ids": "UrlIDs"
+                                },
+                                ExpressionAttributeValues: {
+                                    ":newid": ids
+                                }
+                            }
+                            docClient.update(params, function(err, data) {
+                                if (err)
+                                    res.status(500).send(err);
+                                else
+                                    res.status(200).send("Deleted entity");
+                            });
+                        }else{
+                            console.log(data)
+                        }
+                    }
+                });
+            }
+        });
     }
 })
 
@@ -423,7 +557,27 @@ app.get('/entity/:id', (req, res) => {
             }
         )
     } else {
-
+        let params = {
+            TableName: "entity",
+            Key: {
+                'UrlID': urlID
+            }
+        };
+        docClient.get(params, function(err, data) {
+            if (err)
+                res.status(500).send(err);
+            else {
+                if ("Item" in data) {
+                    if (data.Item.UserID === userID) {
+                        res.status(200).send(data.Item);
+                    } else {
+                        res.status(400).send("Entity not found")
+                    }
+                } else {
+                    res.status(400).send("Entity not found")
+                }
+            }
+        });
     }
 })
 
