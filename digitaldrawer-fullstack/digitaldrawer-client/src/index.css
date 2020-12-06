@@ -6,6 +6,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-bottom: 4em;
+  padding-top: 0em;
 }
 
 code {
@@ -14,10 +16,57 @@ code {
 }
 
 .jumbotron {
-  background-color: #eeeeee;
+  background-color: #dddcdc;
 }
+
 .digitaldrawer-head {
-  color: #8a1919;
+  font-size: 8em;
+  color: rgba(255, 255, 255, .1);
+  background: -webkit-linear-gradient(left, red, orange, yellow, green, blue, indigo, violet) repeat-x;
+  -webkit-background-clip: text;
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
+}
+
+.head_descrip {
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+.bookmark_submit {
+  background-color: #76bc63;
+  align-content: center;
+  padding-bottom: 15px;
+}
+
+label {
+  display: block;
+}
+
+.label-rating {
+  padding: 25px 15px;
+}
+
+.label-name {
+  padding-top: 25px;
+  padding-bottom: 10px;
+}
+
+.label-url {
+  padding-top: 25px;
+  padding-bottom: 10px;
+}
+.check_form {
+  padding-top: 20px;
+  align-content: center;
+}
+
+.check_label {
+  padding-bottom: 20px;
+}
+.label-tags {
+  padding-top: 30px;
+  padding-bottom: 35px;
 }
 
 h2 {
@@ -89,13 +138,11 @@ a {
 
 input {
   font-size: 1em;
-  width: 100%;
+  width: 95%;
   background-color: #edeff0;
   padding: 10px 15px;
-  border: 3px solid #d7dbdf;
-  border-right: none;
+  border: 2px solid #d7dbdf;
   border-radius: 0.35em 0 0 0.35em;
-  outline: none;
 }
 
 .main-nav li {
@@ -185,7 +232,7 @@ input {
 
 @media only screen and (min-width: 768px) {
   body {
-    padding-top: 4em;
+    padding-top: 0;
   }
 
   .container {
