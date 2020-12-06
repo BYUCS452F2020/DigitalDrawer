@@ -1,2 +1,5 @@
 /digitaldrawer-fullstack/node_modules/cors/
 /digitaldrawer-fullstack/.env
+/digitaldrawer-fullstack/NoSQLdb/
+/digitaldrawer-fullstack/node_modules/
+/.idea/
