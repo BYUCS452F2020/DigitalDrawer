@@ -2,9 +2,10 @@ import React, {Component} from "react";
 import PhotoContextProvider from "./context/PhotoContext";
 import {HashRouter, Route, Switch, Redirect} from "react-router-dom";
 import Header from "./Header";
-import Item from "./Item";
 import Search from "./Search";
 import NotFound from "./NotFound";
+import {AddBookmarkForm} from "./AddBookmarkForm";
+import Bookmark from "./Bookmark";
 
 
 export class HomeApp extends Component {
@@ -36,11 +37,11 @@ export class HomeApp extends Component {
                                 render={() => <Redirect to="/favorites"/>}
                             />
 
-                            <Route path="/favorites" render={() => <Item searchTerm="Mae Fah Luang" page="favorites"/>}/>
-                            <Route path="/later" render={() => <Item searchTerm="Grand Canyon" page="later"/>}/>
-                            <Route path="/fun" render={() => <Item searchTerm="Utah Arches" page="fun"/>}/>
-                            <Route path="/business" render={() => <Item searchTerm="Grand Teton" page="work"/>}/>
-                            {/*<Route path="/addBookmark" render={() => <Item searchTerm="work"/>}/>*/}
+                            <Route path="/favorites" render={() => <Bookmark searchTerm="Mae Fah Luang" page="favorites"/>}/>
+                            <Route path="/later" render={() => <Bookmark searchTerm="Grand Canyon" page="later"/>}/>
+                            <Route path="/fun" render={() => <Bookmark searchTerm="Utah Arches" page="fun"/>}/>
+                            <Route path="/business" render={() => <Bookmark searchTerm="Grand Teton" page="work"/>}/>
+                            <Route path="/addBookmark" render={() => <AddBookmarkForm/>}/>
                             <Route
                                 path="/search/:searchInput"
                                 render={props => (
