@@ -3,7 +3,8 @@ import "../../App.scss";
 import { Login, Register } from ".";
 
 export const LoginApp = () => {
-    const [isLoginActive, setisLoginActive] = useState(1);
+    const [isLoginActive, setIsLoginActive] = useState(1);
+
     let current = isLoginActive ? "Register" : "Login";
     let currentActive = isLoginActive ? "Login" : "Register";
 
@@ -21,7 +22,7 @@ export const LoginApp = () => {
             rightSide.classList.add("right");
         }
 
-        setisLoginActive(!isLoginActive);
+        setIsLoginActive(!isLoginActive);
     };
 
     return (
