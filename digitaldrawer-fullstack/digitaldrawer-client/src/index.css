@@ -20,9 +20,9 @@ code {
 }
 
 .digitaldrawer-head {
-  font-size: 8em;
+  font-size: 4em;
   color: rgba(255, 255, 255, .1);
-  background: -webkit-linear-gradient(left, red, orange, yellow, green, blue, indigo, violet) repeat-x;
+  background: -webkit-linear-gradient(left, red, blue) repeat-x;
   -webkit-background-clip: text;
   border-bottom: 1px solid black;
   padding-bottom: 5px;
