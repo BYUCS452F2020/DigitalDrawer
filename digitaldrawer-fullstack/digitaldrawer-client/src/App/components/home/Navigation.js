@@ -5,11 +5,11 @@ const Navigation = () => {
   return (
     <nav className="main-nav">
       <ul>
-        <li><NavLink to="/favorites">Favorite </NavLink></li>
-        <li><NavLink to="/later">Later</NavLink></li>
-        <li><NavLink to="/fun">Fun</NavLink></li>
-        <li><NavLink to="/business">Business</NavLink></li>
-        <li className="add-bookmark"><NavLink to="/addBookmark">+Add</NavLink></li>
+        <li><NavLink activeStyle={{background: "#6cddf1"}} to="/favorites">Favorite</NavLink></li>
+        <li><NavLink activeStyle={{background: "#f38e56"}} to="/later">Later</NavLink></li>
+        <li><NavLink activeStyle={{background: "#dbd063"}} to="/fun">Fun</NavLink></li>
+        <li><NavLink activeStyle={{background: "#fc7abf"}} to="/business">Business</NavLink></li>
+        <li><NavLink activeStyle={{background: "#76bc63"}} to="/addBookmark">+Add</NavLink></li>
       </ul>
     </nav>
   );
