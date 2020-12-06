@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "./Container";
 
-const Item = ({ searchTerm, page }) => {
+const Bookmark = ({ searchTerm, page }) => {
     let msg;
     switch (page) {
         case "favorites":
@@ -29,4 +29,4 @@ const Item = ({ searchTerm, page }) => {
   );
 };
 
-export default Item;
+export default Bookmark;
