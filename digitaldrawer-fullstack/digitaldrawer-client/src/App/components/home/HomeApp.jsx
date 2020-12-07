@@ -5,6 +5,7 @@ import Header from "./Header";
 import Search from "./Search";
 import NotFound from "./NotFound";
 import {AddBookmarkForm} from "./AddBookmarkForm";
+import {CreateDrawerForm} from "./CreateDrawerForm";
 import Bookmark from "./Bookmark";
 import Navigation from "./Navigation";
 
@@ -48,6 +49,7 @@ export class HomeApp extends Component {
                             <Route path="/fun" render={() => <Bookmark searchTerm="Utah Arches" page="fun"/>}/>
                             <Route path="/business" render={() => <Bookmark searchTerm="Grand Teton" page="work"/>}/>
                             <Route path="/addBookmark" render={() => <AddBookmarkForm/>}/>
+                            <Route path="/createDrawer" render={() => <CreateDrawerForm/>}/>
                             <Route
                                 path="/search/:searchInput"
                                 render={props => (
