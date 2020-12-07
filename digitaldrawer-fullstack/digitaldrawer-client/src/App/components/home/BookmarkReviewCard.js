@@ -15,6 +15,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
+import withStyles from "@material-ui/core/styles/withStyles";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,6 +41,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+        backgroundColor: '#f5f5f9',
+        color: 'rgba(0, 0, 0, 0.87)',
+        maxWidth: 220,
+        fontSize: theme.typography.pxToRem(12),
+        border: '1px solid #dadde9',
+    },
+}))(Tooltip);
+
 export default function BookmarkReviewCard({ url, key, alt, date }) {
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(false);
@@ -46,6 +58,10 @@ export default function BookmarkReviewCard({ url, key, alt, date }) {
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+
+    function handleURLClick() {
+        alert("Opening your bookmark");
+    }
 
     return (
         <Card className={classes.root}>
@@ -55,41 +71,88 @@ export default function BookmarkReviewCard({ url, key, alt, date }) {
                         JB
                     </Avatar>
                 }
+
                 action={
-                    <IconButton aria-label="settings">
-                        <MoreVertIcon/>
-                    </IconButton>
+                    <HtmlTooltip
+                        title={
+                            <React.Fragment>
+                                <Typography color="inherit"><strong>Bookmark Options</strong></Typography>
+                                {"The Options menus is where you can change your rating, add/remove tags, add notes, and change the picture"}
+                            </React.Fragment>
+                        }
+                    >
+                        <IconButton aria-label="settings">
+                            <MoreVertIcon/>
+                        </IconButton>
+                    </HtmlTooltip>
                 }
                 title={alt}
                 subheader={date}
             />
-            <CardMedia
-                className={classes.media}
-                image={url}
-                title={alt}
-            />
-            <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p">
-                    www.******.com
-                </Typography>
-            </CardContent>
+            <HtmlTooltip
+                title={
+                    <React.Fragment>
+                        <Typography color="inherit"><strong>Bookmark Picture</strong></Typography>
+                        {"Take a screenshot or choose from a selection of icons to easily remember bookmarks"}
+                    </React.Fragment>
+                }
+            >
+                <CardMedia
+                    className={classes.media}
+                    image={url}
+                    title={alt}
+                />
+            </HtmlTooltip>
+
+            <HtmlTooltip
+                title={
+                    <React.Fragment>
+                        <Typography color="inherit"><strong>Bookmark URL</strong></Typography>
+                        {"Go directly to your bookmark source by selecting the URL"}
+                    </React.Fragment>
+                }
+            >
+                <CardContent>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                        <span onClick={handleURLClick}>www.yourURLHere.com</span>
+                    </Typography>
+                </CardContent>
+            </HtmlTooltip>
             <CardActions disableSpacing>
                 <IconButton aria-label="add to favorites">
                     <FavoriteIcon/>
                 </IconButton>
-                <IconButton aria-label="share">
-                    <ShareIcon/>
-                </IconButton>
-                <IconButton
-                    className={clsx(classes.expand, {
-                        [classes.expandOpen]: expanded,
-                    })}
-                    onClick={handleExpandClick}
-                    aria-expanded={expanded}
-                    aria-label="show more"
+                <HtmlTooltip
+                    title={
+                        <React.Fragment>
+                            <Typography color="inherit"><strong>Share With Anyone</strong></Typography>
+                            {"Share with anyone on any platform"}
+                        </React.Fragment>
+                    }
                 >
-                    <ExpandMoreIcon/>
-                </IconButton>
+                    <IconButton aria-label="share">
+                        <ShareIcon/>
+                    </IconButton>
+                </HtmlTooltip>
+                <HtmlTooltip
+                    title={
+                        <React.Fragment>
+                            <Typography color="inherit"><strong>Expand For More Info</strong></Typography>
+                            {"See your notes, tags, pictures, rating, and frequency. "}
+                        </React.Fragment>
+                    }
+                >
+                    <IconButton
+                        className={clsx(classes.expand, {
+                            [classes.expandOpen]: expanded,
+                        })}
+                        onClick={handleExpandClick}
+                        aria-expanded={expanded}
+                        aria-label="show more"
+                    >
+                        <ExpandMoreIcon/>
+                    </IconButton>
+                </HtmlTooltip>
             </CardActions>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>

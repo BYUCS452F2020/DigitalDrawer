@@ -18,6 +18,9 @@ import AppBar from "@material-ui/core/AppBar";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import IconButton from '@material-ui/core/IconButton';
+import Button from "@material-ui/core/Button";
+import withStyles from "@material-ui/core/styles/withStyles";
+import Tooltip from '@material-ui/core/Tooltip'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -84,6 +87,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+        backgroundColor: '#f5f5f9',
+        color: 'rgba(0, 0, 0, 0.87)',
+        maxWidth: 220,
+        fontSize: theme.typography.pxToRem(12),
+        border: '1px solid #dadde9',
+    },
+}))(Tooltip);
+
 export default function Header({history, handleSubmit}) {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -148,32 +161,61 @@ export default function Header({history, handleSubmit}) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography className={classes.title} variant="h6" noWrap>
+                    <Typography className={classes.title} variant="h5" noWrap>
                         DigitalDrawer
                     </Typography>
-                    <div className={"search-bar"}>
-                        <InputBase
-                            classes={{
-                                root: classes.inputRoot,
-                                input: classes.inputInput,
-                            }}
-                            inputProps={{ 'aria-label': 'search' }}
-                            onSubmit={handleSubmit}
-                        />
-                        <Form history={history} handleSubmit={handleSubmit}/>
-                    </div>
+                    <HtmlTooltip
+                        title={
+                            <React.Fragment>
+                                <Typography color="inherit"><strong>Search Bookmarks!</strong></Typography>
+                                {"Find yours, or others, previously saved bookmarks"}
+                            </React.Fragment>
+                        }
+                    >
+                        <div className={"search-bar"}>
+                            <InputBase
+                                classes={{
+                                    root: classes.inputRoot,
+                                    input: classes.inputInput,
+                                }}
+                                inputProps={{ 'aria-label': 'search' }}
+                                onSubmit={handleSubmit}
+                            />
+                            <Form history={history} handleSubmit={handleSubmit}/>
+                        </div>
+                    </HtmlTooltip>
+
                     <div className={classes.grow} />
                     <div className={classes.sectionDesktop}>
-                        <IconButton aria-label="show 4 new mails" color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <MailIcon onClick={handleOpenMessages}/>
-                            </Badge>
-                        </IconButton>
-                        <IconButton aria-label="show 17 new notifications" color="inherit">
-                            <Badge badgeContent={17} color="secondary">
-                                <NotificationsIcon onClick={handleOpenNotifications}/>
-                            </Badge>
-                        </IconButton>
+                        <HtmlTooltip
+                            title={
+                                <React.Fragment>
+                                    <Typography color="inherit"><strong>Send Messages</strong></Typography>
+                                    {"Instantly talk with other users about your content"}
+                                </React.Fragment>
+                            }
+                        >
+                            <IconButton aria-label="show 4 new mails" color="inherit">
+                                <Badge badgeContent={4} color="secondary">
+                                    <MailIcon onClick={handleOpenMessages}/>
+                                </Badge>
+                            </IconButton>
+                        </HtmlTooltip>
+                        <HtmlTooltip
+                            title={
+                                <React.Fragment>
+                                    <Typography color="inherit"><strong>Get Notifications</strong></Typography>
+                                    {"You can control what notifications you want to receive"}
+                                </React.Fragment>
+                            }
+                        >
+                            <IconButton aria-label="show 17 new notifications" color="inherit">
+                                <Badge badgeContent={17} color="secondary">
+                                    <NotificationsIcon onClick={handleOpenNotifications}/>
+                                </Badge>
+                            </IconButton>
+                        </HtmlTooltip>
+
                         <IconButton
                             edge="end"
                             aria-label="account of current user"

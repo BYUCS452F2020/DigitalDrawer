@@ -11,6 +11,18 @@ import Button from "@material-ui/core/Button";
 import withStyles from "@material-ui/core/styles/withStyles";
 import yellow from "@material-ui/core/colors/yellow";
 import green from "@material-ui/core/colors/green";
+import Tooltip from "@material-ui/core/Tooltip";
+import Typography from "@material-ui/core/Typography";
+
+const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+        backgroundColor: '#f5f5f9',
+        color: 'rgba(0, 0, 0, 0.87)',
+        maxWidth: 220,
+        fontSize: theme.typography.pxToRem(12),
+        border: '1px solid #dadde9',
+    },
+}))(Tooltip);
 
 const GoldCheckbox = withStyles({
     root: {
@@ -46,7 +58,7 @@ export function AddBookmarkForm(props) {
 
     const handleSubmit = (evt) => {
         evt.preventDefault();
-        alert(`Submitting...\n
+        alert(`Adding Bookmark...\n
         --> Bookmark: ${name}\n
         -->URL: ${URL}\n
         -->Rating: ${rating.x.toString()}\n
@@ -66,14 +78,41 @@ export function AddBookmarkForm(props) {
 
     return (
         <FormGroup onSubmit={handleSubmit}>
-            <div>
-                <TextField required id={"standard-required"} fullWidth label={"Name"} variant="outlined" {...bindName} />
-            </div>
-            <div>
-                <TextField required id={"standard-required"} fullWidth label={"URL"} variant="outlined" {...bindURL} />
-            </div>
+            <HtmlTooltip
+                title={
+                    <React.Fragment>
+                        <Typography color="inherit"><strong>Name your bookmark!</strong></Typography>
+                        {"Choose a name to help you remember what it is"}
+                    </React.Fragment>
+                }
+            >
+                <div>
+                    <TextField required id={"standard-required"} fullWidth label={"Name"} variant="outlined" {...bindName} />
+                </div>
+            </HtmlTooltip>
+            <HtmlTooltip
+                title={
+                    <React.Fragment>
+                        <Typography color="inherit"><strong>Bookmark URL</strong></Typography>
+                        {"Where do you want this bookmark to take you?"}
+                    </React.Fragment>
+                }
+            >
+                <div>
+                    <TextField required id={"standard-required"} fullWidth label={"URL"} variant="outlined" {...bindURL} />
+                </div>
+            </HtmlTooltip>
             <FormGroup className={"check_form"}>
-                <FormLabel component="legend" className={"check_label"}><strong>Tags</strong></FormLabel>
+                <HtmlTooltip
+                    title={
+                        <React.Fragment>
+                            <Typography color="inherit"><strong>Add a tag</strong></Typography>
+                            {"Your custom tags will show up below!"}
+                        </React.Fragment>
+                    }
+                >
+                    <FormLabel component="legend" className={"check_label"}><strong>Tags</strong></FormLabel>
+                </HtmlTooltip>
                 <div className={"check_label"}>
 
                 </div>
@@ -96,7 +135,16 @@ export function AddBookmarkForm(props) {
             </FormGroup>
             <label>
                 <Fragment>
-                    <div className={"label-rating"}><strong>{'Rating: ' + rating.x}</strong></div>
+                    <HtmlTooltip
+                        title={
+                            <React.Fragment>
+                                <Typography color="inherit"><strong>Rate your bookmark</strong></Typography>
+                                {"How good is this bookmark to you?"}
+                            </React.Fragment>
+                        }
+                    >
+                        <div className={"label-rating"}><strong>{'Rating: ' + rating.x}</strong></div>
+                    </HtmlTooltip>
                     <Slider
                         axis="x"
                         styles={{
@@ -124,7 +172,16 @@ export function AddBookmarkForm(props) {
                 <br/>
                 <br/>
             </label>
-            <Button onClick={handleSubmit} variant={"contained"} color="primary">Add Bookmark</Button>
+            <HtmlTooltip
+                title={
+                    <React.Fragment>
+                        <Typography color="inherit"><strong>Add the bookmark!</strong></Typography>
+                        {"Save this bookmark into your profile."}
+                    </React.Fragment>
+                }
+            >
+                <Button onClick={handleSubmit} variant={"contained"} color="primary">Add Bookmark</Button>
+            </HtmlTooltip>
             <br/>
             <br/>
             <br/>

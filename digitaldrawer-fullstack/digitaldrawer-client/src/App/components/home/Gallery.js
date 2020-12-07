@@ -23,7 +23,7 @@ const Gallery = props => {
   }
   return (
     <div>
-      <ul>{bookmarks.slice(1, 4)}</ul>
+      <ul>{bookmarks.slice(1, 10)}</ul>
       {noBookmarks}
     </div>
   );
