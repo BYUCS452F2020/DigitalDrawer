@@ -33,6 +33,10 @@ code {
   padding-bottom: 40px;
 }
 
+.search-bar {
+  padding-left: 100px;
+}
+
 .bookmark_submit {
   background-color: #76bc63;
   align-content: center;
