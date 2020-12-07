@@ -6,6 +6,7 @@ import Search from "./Search";
 import NotFound from "./NotFound";
 import {AddBookmarkForm} from "./AddBookmarkForm";
 import Bookmark from "./Bookmark";
+import Navigation from "./Navigation";
 
 
 export class HomeApp extends Component {
@@ -28,6 +29,11 @@ export class HomeApp extends Component {
                                     handleSubmit={this.handleSubmit}
                                     history={props.history}
                                 />
+                            )}
+                        />
+                        <Route
+                            render={props => (
+                                <Navigation />
                             )}
                         />
                         <Switch>
