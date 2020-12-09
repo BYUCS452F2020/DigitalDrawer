@@ -17,6 +17,10 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import withStyles from "@material-ui/core/styles/withStyles";
 import Tooltip from "@material-ui/core/Tooltip";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
+import SaveIcon from '@material-ui/icons/Save';
+import AlarmIcon from '@material-ui/icons/Alarm';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,6 +45,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+var cardStyle = {
+    display: 'block',
+    width: '30vw',
+    transitionDuration: '0.3s',
+}
+
 const HtmlTooltip = withStyles((theme) => ({
     tooltip: {
         backgroundColor: '#f5f5f9',
@@ -51,7 +61,7 @@ const HtmlTooltip = withStyles((theme) => ({
     },
 }))(Tooltip);
 
-export default function BookmarkReviewCard({ url, key, alt, date }) {
+export default function BookmarkReviewCard({ url, key, alt, date, site }) {
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(false);
 
@@ -64,7 +74,7 @@ export default function BookmarkReviewCard({ url, key, alt, date }) {
     }
 
     return (
-        <Card className={classes.root}>
+        <Card style={cardStyle} className={classes.root}>
             <CardHeader
                 avatar={
                     <Avatar aria-label="recipe" className={classes.avatar}>
@@ -114,14 +124,25 @@ export default function BookmarkReviewCard({ url, key, alt, date }) {
             >
                 <CardContent>
                     <Typography variant="body2" color="textSecondary" component="p">
-                        <span onClick={handleURLClick}>www.yourURLHere.com</span>
+                        <span onClick={handleURLClick}> {site} </span>
                     </Typography>
                 </CardContent>
             </HtmlTooltip>
             <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                    <FavoriteIcon/>
-                </IconButton>
+                <HtmlTooltip
+                    title={
+                        <React.Fragment>
+                            <Typography color="inherit"><strong>See Your Tags</strong></Typography>
+                            {"Quickly identify what the content is from the tags"}
+                        </React.Fragment>
+                    }
+                >
+                    <IconButton aria-label="add to favorites">
+                        <FavoriteIcon
+                            color={"secondary"}
+                        />
+                    </IconButton>
+                </HtmlTooltip>
                 <HtmlTooltip
                     title={
                         <React.Fragment>
@@ -131,7 +152,9 @@ export default function BookmarkReviewCard({ url, key, alt, date }) {
                     }
                 >
                     <IconButton aria-label="share">
-                        <ShareIcon/>
+                        <ShareIcon
+                            color={"primary"}
+                        />
                     </IconButton>
                 </HtmlTooltip>
                 <HtmlTooltip
@@ -157,14 +180,50 @@ export default function BookmarkReviewCard({ url, key, alt, date }) {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <Typography paragraph>
-                        Tags for your bookmarks will show next to the share button
+                        You choose what data to show/save. All of the bookmark metadata will be available to select and display here!
                     </Typography>
                     <Typography paragraph>
                         <strong>Bookmark information will go below:</strong>
                     </Typography>
-                    <Typography paragraph>
-                        You can can add notes, pictures, and even set reminders here!
-                    </Typography>
+                    <TextField
+                        id="outlined-multiline-static"
+                        label=""
+                        multiline
+                        rows={4}
+                        placeholder="Add notes or drag and drop any media here. Screenshots, recordings, music, etc."
+                        variant="outlined"
+                    />
+                    <br/>
+                    <HtmlTooltip
+                        title={
+                            <React.Fragment>
+                                <Typography color="inherit"><strong>Save Your Notes Or Media</strong></Typography>
+                                {"Click here to save your notes or media to your profile for this bookmark"}
+                            </React.Fragment>
+                        }
+                    >
+                        <Button
+                            variant="contained"
+                            color="green"
+                            size="small"
+                            className={classes.button}
+                            startIcon={<SaveIcon />}
+                        >
+                            Save
+                        </Button>
+                    </HtmlTooltip>
+                    <HtmlTooltip
+                        title={
+                            <React.Fragment>
+                                <Typography color="inherit"><strong>Set a Reminder</strong></Typography>
+                                {"Remind yourself to comeback to this bookmark at any time. SMS reminders coming soon!"}
+                            </React.Fragment>
+                        }
+                    >
+                        <IconButton color="secondary" aria-label="add an alarm">
+                            <AlarmIcon />
+                        </IconButton>
+                    </HtmlTooltip>
 
                 </CardContent>
             </Collapse>
