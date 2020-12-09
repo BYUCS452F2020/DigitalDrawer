@@ -79,12 +79,6 @@ const useStyles = makeStyles((theme) => ({
             display: 'flex',
         },
     },
-    sectionMobile: {
-        display: 'flex',
-        [theme.breakpoints.up('md')]: {
-            display: 'none',
-        },
-    },
 }));
 
 const HtmlTooltip = withStyles((theme) => ({
@@ -151,7 +145,7 @@ export default function Header({history, handleSubmit}) {
 
     return (
         <div className={classes.grow}>
-            <AppBar position="static">
+            <AppBar style={{ background: 'rgb(5, 28, 51) none repeat scroll 0% 0%'}} position="static">
                 <Toolbar>
                     <IconButton
                         edge="start"
