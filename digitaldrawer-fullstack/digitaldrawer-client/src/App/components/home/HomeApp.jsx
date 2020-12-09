@@ -8,6 +8,7 @@ import {AddBookmarkForm} from "./AddBookmarkForm";
 import {CreateDrawerForm} from "./CreateDrawerForm";
 import Bookmark from "./Bookmark";
 import Navigation from "./Navigation";
+import Footer from "./Footer";
 
 
 export class HomeApp extends Component {
@@ -58,6 +59,11 @@ export class HomeApp extends Component {
                             />
                             <Route component={NotFound}/>
                         </Switch>
+                        <Route
+                            render={props => (
+                                <Footer />
+                            )}
+                        />
                     </div>
                 </HashRouter>
             </PhotoContextProvider>
